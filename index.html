@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050609">
+<meta name="description" content="DOOMSDAY countdown">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png">
+<title>DOOMSDAY · Countdown</title>
+<style>
+*{box-sizing:border-box}:root{color-scheme:dark}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 18% 38%,rgba(14,77,63,.30),transparent 27%),radial-gradient(ellipse at 85% 100%,rgba(28,65,105,.34),transparent 38%),radial-gradient(circle at 70% 20%,#19202b 0,#080a10 40%,#020306 100%);color:#f7f4ff;font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
+main{width:min(100%,560px);padding:30px 22px 34px;border:1px solid rgba(195,206,255,.12);border-radius:24px;background:rgba(0,0,0,.34);box-shadow:0 18px 60px #0009;text-align:center}
+.kicker{font-size:12px;letter-spacing:.28em;color:#a8b5c7;text-transform:uppercase;margin-bottom:24px}
+h1{font-size:clamp(30px,8vw,48px);letter-spacing:.12em;margin:0 0 9px;font-weight:800}
+.date{color:#b9bdcc;font-size:15px;margin-bottom:26px}
+.timer{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.unit{min-width:0}.number{font-variant-numeric:tabular-nums;font-size:clamp(27px,7vw,48px);font-weight:800;letter-spacing:-.04em;text-shadow:0 0 18px rgba(190,185,255,.18)}
+.label{font-size:11px;letter-spacing:.12em;color:#aeb4c5;margin-top:7px;text-transform:uppercase}
+.rule{height:1px;background:linear-gradient(90deg,transparent,#aab3d855,transparent);margin:26px 0 18px}
+.status{font-size:12px;letter-spacing:.1em;color:#8794aa}
+@media(max-width:360px){main{padding:25px 12px}.timer{gap:3px}.label{font-size:9px}}
+</style>
+</head>
+<body>
+<main>
+<div class="kicker">COUNTDOWN</div>
+<h1>DOOMSDAY</h1>
+<div class="date">17 DE DICIEMBRE DE 2026 · 00:00</div>
+<section class="timer" aria-label="Tiempo restante">
+<div class="unit"><div class="number" id="months">--</div><div class="label">Meses</div></div>
+<div class="unit"><div class="number" id="days">--</div><div class="label">Días</div></div>
+<div class="unit"><div class="number" id="hours">--</div><div class="label">Horas</div></div>
+<div class="unit"><div class="number" id="minutes">--</div><div class="label">Min</div></div>
+<div class="unit"><div class="number" id="seconds">--</div><div class="label">Seg</div></div>
+</section>
+<div class="rule"></div>
+<div class="status" id="status">TIEMPO RESTANTE · ACTUALIZACIÓN EN VIVO</div>
+</main>
+<script>
+const target=new Date(2026,11,17,0,0,0,0);
+const ids=["months","days","hours","minutes","seconds"];
+function addMonths(date,n){const d=new Date(date),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return d}
+function update(){const now=new Date();if(now>=target){ids.forEach(id=>document.getElementById(id).textContent="00");document.getElementById("status").textContent="HA LLEGADO EL DÍA";return}
+let m=(target.getFullYear()-now.getFullYear())*12+target.getMonth()-now.getMonth();while(m>0&&addMonths(now,m)>target)m--;
+let rest=target-addMonths(now,m);const d=Math.floor(rest/86400000);rest%=86400000;const h=Math.floor(rest/3600000);rest%=3600000;const min=Math.floor(rest/60000);rest%=60000;const s=Math.floor(rest/1000);
+[m,d,h,min,s].forEach((v,i)=>document.getElementById(ids[i]).textContent=String(v).padStart(2,"0"))}
+update();setInterval(update,1000);
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+</script>
+</body>
+</html>
